@@ -14,14 +14,17 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 
 set(PROJECT_SOURCES
         main.cpp
-        LayerManager.cpp
-        LayerManager.h
+
+
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(ScadaMAS
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
+        widget.h widget.cpp
+        mainmenu.h mainmenu.cpp
+        layermanager.h layermanager.cpp
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET ScadaMAS APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR

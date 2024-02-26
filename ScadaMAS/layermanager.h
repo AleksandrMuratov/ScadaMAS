@@ -6,9 +6,10 @@
 class LayerManager : public QWidget
 {
     Q_OBJECT
-
 public:
-    LayerManager(QWidget *parent = nullptr);
-    ~LayerManager();
+    explicit LayerManager(QWidget *parent = nullptr);
+
+signals:
 };
+
 #endif // LAYERMANAGER_H

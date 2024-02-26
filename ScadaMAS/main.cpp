@@ -1,11 +1,14 @@
-#include "LayerManager.h"
+#include "widget.h"
+#include "mainmenu.h"
+
 
 #include <QApplication>
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    LayerManager w;
-    w.show();
+    Widget wgt;
+    MainMenu* menu = new MainMenu(&wgt);
+    wgt.show();
     return a.exec();
 }
