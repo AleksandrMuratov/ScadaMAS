@@ -1,5 +1,6 @@
 #ifndef MAINMENU_H
 #define MAINMENU_H
+#include "mygraphicsscene.h"
 
 #include <QMenuBar>
 
@@ -7,12 +8,13 @@ class MainMenu : public QMenuBar
 {
     Q_OBJECT
 public:
-    MainMenu(QWidget* parrent = nullptr);
+    MainMenu(MyGraphicsScene* scene, QWidget* parrent = nullptr);
 
 private:
     QMenu* menu = nullptr;
     QAction* menuAction = nullptr;
-    QAction* createObject = nullptr;
+    QMenu* createObject = nullptr;
+    QAction* createButton = nullptr;
 };
 
 #endif // MAINMENU_H

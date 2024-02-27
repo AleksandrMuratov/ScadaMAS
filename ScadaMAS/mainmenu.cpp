@@ -1,10 +1,14 @@
 #include "mainmenu.h"
 
-MainMenu::MainMenu(QWidget* parent):
+MainMenu::MainMenu(MyGraphicsScene* scene, QWidget* parent):
     QMenuBar(parent)
 {
     menu = this->addMenu("Меню");
     menuAction = menu->menuAction();
-    createObject = menu->addAction("Создать");
-    //createObject->toggled();
+    createObject = menu->addMenu("Cоздать");
+    createButton = createObject->addAction("Кнопка");
+    if(scene)
+    {
+        QObject::connect(createButton, &QAction::triggered, scene, &MyGraphicsScene::slotCreateButton);
+    }
 }

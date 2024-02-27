@@ -8,7 +8,6 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     Widget wgt;
-    MainMenu* menu = new MainMenu(&wgt);
     wgt.show();
     return a.exec();
 }
