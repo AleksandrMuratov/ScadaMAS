@@ -11,6 +11,7 @@ class MyGraphicsScene : public QGraphicsScene
     Q_OBJECT
 public:
     explicit MyGraphicsScene(QObject *parent = nullptr);
+    explicit MyGraphicsScene(const QRectF& sceneRect, QObject* parent = nullptr);
 
 public slots:
     void slotCreateButton();
