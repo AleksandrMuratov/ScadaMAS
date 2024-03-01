@@ -4,8 +4,6 @@
 #include <QGraphicsScene>
 #include <QObject>
 
-
-
 class MyGraphicsScene : public QGraphicsScene
 {
     Q_OBJECT

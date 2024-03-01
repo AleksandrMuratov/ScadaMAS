@@ -27,5 +27,4 @@ Widget::Widget(QWidget *parent)
     pvbxLayout->addWidget(pMenu);
     pvbxLayout->addWidget(pView);
     this->setLayout(pvbxLayout);
-    //pView->fitInView(pScene->sceneRect());
 }
