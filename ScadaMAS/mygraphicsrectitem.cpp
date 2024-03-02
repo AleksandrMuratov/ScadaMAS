@@ -12,12 +12,20 @@ MyGraphicsRectItem::MyGraphicsRectItem(const QRectF &rect, QGraphicsItem *parent
 
 void MyGraphicsRectItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 {
-    this->setPos(mapToScene(event->pos()));
+    if(dataPressMouse.mb & Qt::LeftButton)
+    {
+        this->setPos(mapToScene(event->pos()) - dataPressMouse.dPoint);
+    }
 }
 
 void MyGraphicsRectItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    this->setCursor(QCursor(Qt::ClosedHandCursor));
+    dataPressMouse.mb = event->button();
+    dataPressMouse.dPoint = event->buttonDownPos(dataPressMouse.mb);
+    if(dataPressMouse.mb & Qt::LeftButton)
+    {
+        this->setCursor(QCursor(Qt::ClosedHandCursor));
+    }
     Q_UNUSED(event);
 }
 
