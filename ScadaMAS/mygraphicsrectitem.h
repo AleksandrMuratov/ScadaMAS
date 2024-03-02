@@ -13,6 +13,8 @@ public:
 protected:
 
     void mouseMoveEvent(QGraphicsSceneMouseEvent* event);
+    void mousePressEvent(QGraphicsSceneMouseEvent* event);
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent* event);
 };
 
 #endif // MYGRAPHICSRECTITEM_H

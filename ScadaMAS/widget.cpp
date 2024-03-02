@@ -15,12 +15,13 @@ Widget::Widget(QWidget *parent)
 {
     this->setWindowTitle("ScadaMAS");
     QList<QScreen*> monitors = QGuiApplication::screens();
+    QSize sizeWindow;
     if(!monitors.empty())
     {
-        const QSize sizeWindow = monitors[0]->availableSize();
+        sizeWindow = monitors[0]->availableSize();
         this->setGeometry(0, 0, sizeWindow.width(), sizeWindow.height());
     }
-    MyGraphicsScene* pScene = new MyGraphicsScene(QRectF(-100, -100, 640, 480));
+    MyGraphicsScene* pScene = new MyGraphicsScene(QRectF(0, 0, sizeWindow.width(), sizeWindow.height()));
     pView = new MyGraphicsView(pScene);
     MainMenu* pMenu = new MainMenu(pScene);
     QVBoxLayout* pvbxLayout = new QVBoxLayout;
