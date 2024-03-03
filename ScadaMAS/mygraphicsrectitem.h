@@ -12,15 +12,43 @@ public:
 
 protected:
 
-    void mouseMoveEvent(QGraphicsSceneMouseEvent* event);
-    void mousePressEvent(QGraphicsSceneMouseEvent* event);
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent* event);
+    void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override;
+    void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
+    void hoverMoveEvent(QGraphicsSceneHoverEvent* event) override;
+    void paint(QPainter* painter, const QStyleOptionGraphicsItem * option, QWidget* widget) override;
 
 private:
+    enum class IntersectionWithFrame
+    {
+        NO,
+        LEFT_TOP,
+        RIGHT_TOP,
+        LEFT_DOWN,
+        RIGHT_DOWN,
+        TOP,
+        DOWN,
+        LEFT,
+        RIGHT
+    };
+
+    IntersectionWithFrame cursorOnFrame(QPointF p) const;
+
+    void resizeFrame(IntersectionWithFrame intersection, QPointF point);
+    void resizeFrameLeftTop(QPointF point);
+    void resizeFrameRightTop(QPointF point);
+    void resizeFrameLeftDown(QPointF point);
+    void resizeFrameRightDown(QPointF point);
+    void resizeFrameTop(QPointF point);
+    void resizeFrameLeft(QPointF point);
+    void resizeFrameRight(QPointF point);
+    void resizeFrameDown(QPointF point);
+
     struct DataPressMouse
     {
         Qt::MouseButton mb;
         QPointF dPoint;
+        IntersectionWithFrame intersectionWithFrame;
     };
     DataPressMouse dataPressMouse;
 };
