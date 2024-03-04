@@ -17,46 +17,40 @@ MyGraphicsRectItem::MyGraphicsRectItem(const QRectF &rect, QGraphicsItem *parent
 
 void MyGraphicsRectItem::hoverMoveEvent(QGraphicsSceneHoverEvent* event)
 {
-    switch (cursorOnFrame(event->pos())) {
-    case IntersectionWithFrame::LEFT_TOP:
+    int edges = cursorOnFrame(mapToScene(event->pos()));
+    if(((edges & Edges::LEFT) && (edges & Edges::TOP))
+        || ((edges & Edges::RIGHT) && (edges & Edges::BOTTOM)))
+    {
         this->setCursor(QCursor(Qt::SizeFDiagCursor));
-        break;
-    case IntersectionWithFrame::TOP:
-        this->setCursor(QCursor(Qt::SizeVerCursor));
-        break;
-    case IntersectionWithFrame::RIGHT_TOP:
+    }
+    else if(((edges & Edges::RIGHT) && (edges & Edges::TOP))
+               || ((edges & Edges::LEFT) && (edges & Edges::BOTTOM)))
+    {
         this->setCursor(QCursor(Qt::SizeBDiagCursor));
-        break;
-    case IntersectionWithFrame::LEFT:
+    }
+    else if((edges & Edges::LEFT) || (edges & Edges::RIGHT))
+    {
         this->setCursor(QCursor(Qt::SizeHorCursor));
-        break;
-    case IntersectionWithFrame::RIGHT:
-        this->setCursor(QCursor(Qt::SizeHorCursor));
-        break;
-    case IntersectionWithFrame::LEFT_DOWN:
-        this->setCursor(QCursor(Qt::SizeBDiagCursor));
-        break;
-    case IntersectionWithFrame::RIGHT_DOWN:
-        this->setCursor(QCursor(Qt::SizeFDiagCursor));
-        break;
-    case IntersectionWithFrame::DOWN:
+    }
+    else if((edges & Edges::TOP) || (edges & Edges::BOTTOM))
+    {
         this->setCursor(QCursor(Qt::SizeVerCursor));
-        break;
-    default:
+    }
+    else
+    {
         this->setCursor(QCursor(Qt::OpenHandCursor));
-        break;
     }
 }
 
 void MyGraphicsRectItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 {
-    if((dataPressMouse.mb & Qt::LeftButton) && dataPressMouse.intersectionWithFrame == IntersectionWithFrame::NO)
+    if((dataPressMouse.mb & Qt::LeftButton) && (!dataPressMouse.edges))
     {
         this->setPos(mapToScene(event->pos() - dataPressMouse.dPoint));
     }
     else
     {
-        this->resizeFrame(dataPressMouse.intersectionWithFrame, mapToScene(event->pos()));
+        this->resizeFrame(static_cast<Edges>(dataPressMouse.edges), mapToScene(event->pos()));
     }
 }
 
@@ -64,8 +58,8 @@ void MyGraphicsRectItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     dataPressMouse.mb = event->button();
     dataPressMouse.dPoint = event->pos();
-    dataPressMouse.intersectionWithFrame = cursorOnFrame(dataPressMouse.dPoint);
-    if((dataPressMouse.mb & Qt::LeftButton) && dataPressMouse.intersectionWithFrame == IntersectionWithFrame::NO)
+    dataPressMouse.edges = cursorOnFrame(mapToScene(dataPressMouse.dPoint));
+    if((dataPressMouse.mb & Qt::LeftButton) && (!dataPressMouse.edges))
     {
         this->setCursor(QCursor(Qt::ClosedHandCursor));
     }
@@ -74,10 +68,11 @@ void MyGraphicsRectItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
 void MyGraphicsRectItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
-    if(dataPressMouse.intersectionWithFrame == IntersectionWithFrame::NO)
+    if(!dataPressMouse.edges)
     {
         this->setCursor(QCursor(Qt::OpenHandCursor));
     }
+    dataPressMouse.edges = Edges::NO;
     Q_UNUSED(event);
 }
 
@@ -88,73 +83,60 @@ void MyGraphicsRectItem::paint(QPainter* painter, const QStyleOptionGraphicsItem
     painter->drawRect(this->rect());
 }
 
-MyGraphicsRectItem::IntersectionWithFrame MyGraphicsRectItem::cursorOnFrame(QPointF p) const
+int MyGraphicsRectItem::cursorOnFrame(QPointF p) const
 {
-    qreal widthFrame = 6;
-    QRectF rect = this->boundingRect();
-    if(p.x() < widthFrame && p.y() < widthFrame)
+    int edges = 0;
+    qreal widthFrame = 10;
+    QRectF rect = this->rect();
+    auto ppprect = this->boundingRect();
+
+    if(QRectF(this->x(), this->y(), widthFrame, rect.height()).contains(p))
     {
-        return IntersectionWithFrame::LEFT_TOP;
+        edges |= Edges::LEFT;
     }
-    else if(p.x() < rect.width() - widthFrame && p.y() < widthFrame)
+    if(QRectF(this->x() + rect.width() - widthFrame, this->y(), widthFrame, rect.height()).contains(p))
     {
-        return IntersectionWithFrame::TOP;
+        edges |= Edges::RIGHT;
     }
-    else if(p.y() < widthFrame)
+    if(QRectF(this->x(), this->y(), rect.width(), widthFrame).contains(p))
     {
-        return IntersectionWithFrame::RIGHT_TOP;
+        edges |= Edges::TOP;
     }
-    else if(p.x() < widthFrame && p.y() < rect.height() - widthFrame)
+    if(QRectF(this->x(), this->y() + rect.height() - widthFrame, rect.width(), widthFrame).contains(p))
     {
-        return IntersectionWithFrame::LEFT;
+        edges |= Edges::BOTTOM;
     }
-    else if(p.x() < widthFrame)
-    {
-        return IntersectionWithFrame::LEFT_DOWN;
-    }
-    else if(p.x() < rect.width() - widthFrame && p.y() >= rect.height() - widthFrame)
-    {
-        return IntersectionWithFrame::DOWN;
-    }
-    else if(p.x() >= rect.width() - widthFrame && p.y() < rect.height() - widthFrame)
-    {
-        return IntersectionWithFrame::RIGHT;
-    }
-    else if(p.x() >= rect.width() - widthFrame && p.y() >= rect.height() - widthFrame)
-    {
-        return IntersectionWithFrame::RIGHT_DOWN;
-    }
-    return IntersectionWithFrame::NO;
+    return edges;
 }
 
-void MyGraphicsRectItem::resizeFrame(MyGraphicsRectItem::IntersectionWithFrame intersection, QPointF point)
+void MyGraphicsRectItem::resizeFrame(Edges edges, QPointF point)
 {
-    switch (intersection) {
-    case IntersectionWithFrame::LEFT_TOP:
-        this->resizeFrameLeftTop(point);
-        break;
-    case IntersectionWithFrame::TOP:
-        this->resizeFrameTop(point);
-        break;
-    case IntersectionWithFrame::RIGHT_TOP:
-        this->resizeFrameRightTop(point);
-        break;
-    case IntersectionWithFrame::LEFT:
-        this->resizeFrameLeft(point);
-        break;
-    case IntersectionWithFrame::RIGHT:
-        this->resizeFrameRight(point);
-        break;
-    case IntersectionWithFrame::LEFT_DOWN:
-        this->resizeFrameLeftDown(point);
-        break;
-    case IntersectionWithFrame::RIGHT_DOWN:
-        this->resizeFrameRightDown(point);
-        break;
-    case IntersectionWithFrame::DOWN:
-        this->resizeFrameDown(point);
-        break;
-    }
+    // switch (intersection) {
+    // case IntersectionWithFrame::LEFT_TOP:
+    //     this->resizeFrameLeftTop(point);
+    //     break;
+    // case IntersectionWithFrame::TOP:
+    //     this->resizeFrameTop(point);
+    //     break;
+    // case IntersectionWithFrame::RIGHT_TOP:
+    //     this->resizeFrameRightTop(point);
+    //     break;
+    // case IntersectionWithFrame::LEFT:
+    //     this->resizeFrameLeft(point);
+    //     break;
+    // case IntersectionWithFrame::RIGHT:
+    //     this->resizeFrameRight(point);
+    //     break;
+    // case IntersectionWithFrame::LEFT_DOWN:
+    //     this->resizeFrameLeftDown(point);
+    //     break;
+    // case IntersectionWithFrame::RIGHT_DOWN:
+    //     this->resizeFrameRightDown(point);
+    //     break;
+    // case IntersectionWithFrame::DOWN:
+    //     this->resizeFrameDown(point);
+    //     break;
+    // }
 }
 void MyGraphicsRectItem::resizeFrameLeftTop(QPointF point)
 {

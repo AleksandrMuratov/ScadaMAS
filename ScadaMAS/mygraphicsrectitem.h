@@ -19,22 +19,18 @@ protected:
     void paint(QPainter* painter, const QStyleOptionGraphicsItem * option, QWidget* widget) override;
 
 private:
-    enum class IntersectionWithFrame
+    enum Edges
     {
-        NO,
-        LEFT_TOP,
-        RIGHT_TOP,
-        LEFT_DOWN,
-        RIGHT_DOWN,
-        TOP,
-        DOWN,
-        LEFT,
-        RIGHT
+        NO = 0,
+        TOP = 1,
+        LEFT = 2,
+        RIGHT = 4,
+        BOTTOM = 8
     };
 
-    IntersectionWithFrame cursorOnFrame(QPointF p) const;
+    int cursorOnFrame(QPointF p) const;
 
-    void resizeFrame(IntersectionWithFrame intersection, QPointF point);
+    void resizeFrame(Edges edges, QPointF point);
     void resizeFrameLeftTop(QPointF point);
     void resizeFrameRightTop(QPointF point);
     void resizeFrameLeftDown(QPointF point);
@@ -48,7 +44,7 @@ private:
     {
         Qt::MouseButton mb;
         QPointF dPoint;
-        IntersectionWithFrame intersectionWithFrame;
+        int edges;
     };
     DataPressMouse dataPressMouse;
 };
