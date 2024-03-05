@@ -50,7 +50,7 @@ void MyGraphicsRectItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
     }
     else
     {
-        this->resizeFrame(static_cast<Edges>(dataPressMouse.edges), mapToScene(event->pos()));
+        this->resizeFrame(dataPressMouse.edges, mapToScene(event->pos()));
     }
 }
 
@@ -63,7 +63,6 @@ void MyGraphicsRectItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
     {
         this->setCursor(QCursor(Qt::ClosedHandCursor));
     }
-    Q_UNUSED(event);
 }
 
 void MyGraphicsRectItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
@@ -76,20 +75,18 @@ void MyGraphicsRectItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     Q_UNUSED(event);
 }
 
-void MyGraphicsRectItem::paint(QPainter* painter, const QStyleOptionGraphicsItem * option, QWidget* widget)
-{
-    painter->setPen(this->pen());
-    painter->setBrush(this->brush());
-    painter->drawRect(this->rect());
-}
+// void MyGraphicsRectItem::paint(QPainter* painter, const QStyleOptionGraphicsItem * option, QWidget* widget)
+// {
+//     painter->setPen(this->pen());
+//     painter->setBrush(this->brush());
+//     painter->drawRect(this->rect());
+// }
 
 int MyGraphicsRectItem::cursorOnFrame(QPointF p) const
 {
     int edges = 0;
     qreal widthFrame = 10;
     QRectF rect = this->rect();
-    auto ppprect = this->boundingRect();
-
     if(QRectF(this->x(), this->y(), widthFrame, rect.height()).contains(p))
     {
         edges |= Edges::LEFT;
@@ -109,78 +106,132 @@ int MyGraphicsRectItem::cursorOnFrame(QPointF p) const
     return edges;
 }
 
-void MyGraphicsRectItem::resizeFrame(Edges edges, QPointF point)
+void MyGraphicsRectItem::resizeFrame(int edges, QPointF point)
 {
-    // switch (intersection) {
-    // case IntersectionWithFrame::LEFT_TOP:
-    //     this->resizeFrameLeftTop(point);
-    //     break;
-    // case IntersectionWithFrame::TOP:
-    //     this->resizeFrameTop(point);
-    //     break;
-    // case IntersectionWithFrame::RIGHT_TOP:
-    //     this->resizeFrameRightTop(point);
-    //     break;
-    // case IntersectionWithFrame::LEFT:
-    //     this->resizeFrameLeft(point);
-    //     break;
-    // case IntersectionWithFrame::RIGHT:
-    //     this->resizeFrameRight(point);
-    //     break;
-    // case IntersectionWithFrame::LEFT_DOWN:
-    //     this->resizeFrameLeftDown(point);
-    //     break;
-    // case IntersectionWithFrame::RIGHT_DOWN:
-    //     this->resizeFrameRightDown(point);
-    //     break;
-    // case IntersectionWithFrame::DOWN:
-    //     this->resizeFrameDown(point);
-    //     break;
-    // }
+    if((edges & Edges::LEFT) && (edges & Edges::TOP))
+    {
+        this->resizeFrameLeftTop(point);
+    }
+    else if((edges & Edges::RIGHT) && (edges & Edges::BOTTOM))
+    {
+        this->resizeFrameRightDown(point);
+    }
+    else if((edges & Edges::RIGHT) && (edges & Edges::TOP))
+    {
+        this->resizeFrameRightTop(point);
+    }
+    else if((edges & Edges::LEFT) && (edges & Edges::BOTTOM))
+    {
+        this->resizeFrameLeftDown(point);
+    }
+    else if(edges & Edges::LEFT)
+    {
+        this->resizeFrameLeft(point);
+    }
+    else if(edges & Edges::RIGHT)
+    {
+        this->resizeFrameRight(point);
+    }
+    else if(edges & Edges::TOP)
+    {
+        this->resizeFrameTop(point);
+    }
+    else if(edges & Edges::BOTTOM)
+    {
+        this->resizeFrameDown(point);
+    }
 }
+
+void MyGraphicsRectItem::setPosAndSize(qreal x, qreal y, qreal w, qreal h)
+{
+    if(w > minW && h > minH)
+    {
+        this->setPos(x, y);
+        this->setRect(0, 0, w, h);
+    }
+}
+
 void MyGraphicsRectItem::resizeFrameLeftTop(QPointF point)
 {
     QPointF delta = this->scenePos() - point;
     QRectF rect = this->rect();
     qreal w = rect.width() + delta.x();
     qreal h = rect.height() + delta.y();
-    this->setRect(point.x(), point.y(), w, h);
+    this->setPosAndSize(point.x(), point.y(), w, h);
 }
+
 void MyGraphicsRectItem::resizeFrameRightTop(QPointF point)
 {
-    QPointF rightAngle;
+    QPointF rightTopAngle;
     QPointF curPos = this->scenePos();
     QRectF rect = this->rect();
-    rightAngle.rx() = curPos.x() + rect.width();
-    rightAngle.ry() = curPos.y();
+    rightTopAngle.rx() = curPos.x() + rect.width();
+    rightTopAngle.ry() = curPos.y();
     QPointF delta;
-    delta.ry() = curPos.y() - rightAngle.y();
-    delta.rx() = rightAngle.x() - curPos.x();
+    delta.ry() = rightTopAngle.y() - point.y();
+    delta.rx() = point.x() - rightTopAngle.x();
     qreal w = rect.width() + delta.x();
     qreal h = rect.height() + delta.y();
-    this->setRect(curPos.x(), point.y(), w, h);
+    this->setPosAndSize(this->x(), point.y(), w, h);
 }
+
 void MyGraphicsRectItem::resizeFrameLeftDown(QPointF point)
 {
-
+    QPointF leftDownAngle;
+    QPointF curPos = this->scenePos();
+    QRectF rect = this->rect();
+    leftDownAngle.rx() = curPos.x();
+    leftDownAngle.ry() = curPos.y() + rect.height();
+    QPointF delta;
+    delta.rx() = leftDownAngle.x() - point.x();
+    delta.ry() = point.y() - leftDownAngle.y();
+    qreal w = rect.width() + delta.x();
+    qreal h = rect.height() + delta.y();
+    this->setPosAndSize(point.x(), this->y(), w, h);
 }
 void MyGraphicsRectItem::resizeFrameRightDown(QPointF point)
 {
-
+    QPointF rightDownAngle;
+    QPointF curPos = this->scenePos();
+    QRectF rect = this->rect();
+    rightDownAngle.rx() = curPos.x() + rect.width();
+    rightDownAngle.ry() = curPos.y() + rect.height();
+    QPointF delta;
+    delta.rx() = point.x() - rightDownAngle.x();
+    delta.ry() = point.y() - rightDownAngle.y();
+    qreal w = rect.width() + delta.x();
+    qreal h = rect.height() + delta.y();
+    this->setPosAndSize(this->x(), this->y(), w, h);
 }
 void MyGraphicsRectItem::resizeFrameTop(QPointF point)
 {
-
+    qreal deltaY = this->scenePos().y() - point.y();
+    QRectF rect = this->rect();
+    qreal w = rect.width();
+    qreal h = rect.height() + deltaY;
+    this->setPosAndSize(this->x(), point.y(), w, h);
 }
 void MyGraphicsRectItem::resizeFrameLeft(QPointF point)
 {
-
+    qreal deltaX = this->scenePos().x() - point.x();
+    QRectF rect = this->rect();
+    qreal w = rect.width() + deltaX;
+    qreal h = rect.height();
+    this->setPosAndSize(point.x(), this->y(), w, h);
 }
 void MyGraphicsRectItem::resizeFrameRight(QPointF point)
 {
-
+    QRectF rect = this->rect();
+    qreal deltaX = point.x() - (this->scenePos().x() + rect.width());
+    qreal w = rect.width() + deltaX;
+    qreal h = rect.height();
+    this->setPosAndSize(this->x(), this->y(), w, h);
 }
 void MyGraphicsRectItem::resizeFrameDown(QPointF point)
 {
-
+    QRectF rect = this->rect();
+    qreal deltaY = point.y() - (this->scenePos().y() + rect.height());
+    qreal w = rect.width();
+    qreal h = rect.height() + deltaY;
+    this->setPosAndSize(this->x(), this->y(), w, h);
 }

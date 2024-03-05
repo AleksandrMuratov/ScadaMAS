@@ -16,7 +16,7 @@ protected:
     void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
     void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
     void hoverMoveEvent(QGraphicsSceneHoverEvent* event) override;
-    void paint(QPainter* painter, const QStyleOptionGraphicsItem * option, QWidget* widget) override;
+    //void paint(QPainter* painter, const QStyleOptionGraphicsItem * option, QWidget* widget) override;
 
 private:
     enum Edges
@@ -30,7 +30,7 @@ private:
 
     int cursorOnFrame(QPointF p) const;
 
-    void resizeFrame(Edges edges, QPointF point);
+    void resizeFrame(int edges, QPointF point);
     void resizeFrameLeftTop(QPointF point);
     void resizeFrameRightTop(QPointF point);
     void resizeFrameLeftDown(QPointF point);
@@ -39,6 +39,7 @@ private:
     void resizeFrameLeft(QPointF point);
     void resizeFrameRight(QPointF point);
     void resizeFrameDown(QPointF point);
+    void setPosAndSize(qreal x, qreal y, qreal w, qreal h);
 
     struct DataPressMouse
     {
@@ -47,6 +48,8 @@ private:
         int edges;
     };
     DataPressMouse dataPressMouse;
+    qreal minW = 1;
+    qreal minH = 1;
 };
 
 #endif // MYGRAPHICSRECTITEM_H
