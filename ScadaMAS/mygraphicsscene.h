@@ -12,7 +12,8 @@ public:
     explicit MyGraphicsScene(const QRectF& sceneRect, QObject* parent = nullptr);
 
 public slots:
-    void slotCreateButton();
+    void slotCreateRect();
+    void slotCreatePushButton();
 
 private:
 

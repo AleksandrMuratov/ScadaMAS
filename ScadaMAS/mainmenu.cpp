@@ -6,9 +6,11 @@ MainMenu::MainMenu(MyGraphicsScene* scene, QWidget* parent):
     menu = this->addMenu("Меню");
     menuAction = menu->menuAction();
     createObject = menu->addMenu("Cоздать");
-    createButton = createObject->addAction("Кнопка");
+    createRect = createObject->addAction("Прямоугольник");
+    createPushButton = createObject->addAction("Кнопка");
     if(scene)
     {
-        QObject::connect(createButton, &QAction::triggered, scene, &MyGraphicsScene::slotCreateButton);
+        QObject::connect(createRect, &QAction::triggered, scene, &MyGraphicsScene::slotCreateRect);
+        QObject::connect(createPushButton, &QAction::triggered, scene, &MyGraphicsScene::slotCreatePushButton);
     }
 }

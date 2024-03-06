@@ -14,7 +14,8 @@ private:
     QMenu* menu = nullptr;
     QAction* menuAction = nullptr;
     QMenu* createObject = nullptr;
-    QAction* createButton = nullptr;
+    QAction* createRect = nullptr;
+    QAction* createPushButton = nullptr;
 };
 
 #endif // MAINMENU_H

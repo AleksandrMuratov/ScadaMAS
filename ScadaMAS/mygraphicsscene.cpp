@@ -1,5 +1,6 @@
 #include "mygraphicsscene.h"
 #include "mygraphicsrectitem.h"
+#include "mypushbutton.h"
 
 #include <QtWidgets>
 
@@ -11,7 +12,7 @@ MyGraphicsScene::MyGraphicsScene(const QRectF &sceneRect, QObject *parent)
     : QGraphicsScene(sceneRect, parent)
 {}
 
-void MyGraphicsScene::slotCreateButton()
+void MyGraphicsScene::slotCreateRect()
 {
     QPen pen(Qt::black);
     pen.setWidth(2);
@@ -23,4 +24,10 @@ void MyGraphicsScene::slotCreateButton()
     rect->setPos(300, 300);
     QCursor cur(Qt::OpenHandCursor);
     rect->setCursor(cur);
+}
+
+void MyGraphicsScene::slotCreatePushButton()
+{
+    MyPushButton* button = new MyPushButton();
+    button->setProxyWidget(this->addWidget(button));
 }
