@@ -23,6 +23,7 @@ void MyGraphicsRectItem::setDefaultSettings()
     this->setAcceptHoverEvents(true);
     this->setPen(settings.pen);
     this->setBrush(settings.color);
+    //text  = new QGraphicsTextItem("Пуск", this);
 }
 
 void MyGraphicsRectItem::setColor(QColor color)
@@ -33,6 +34,11 @@ void MyGraphicsRectItem::setColor(QColor color)
 void MyGraphicsRectItem::setColorPressMouse(QColor color)
 {
     settings.colorPressMouse = color;
+}
+
+void MyGraphicsRectItem::setText(const QString& txt)
+{
+    settings.text = txt;
 }
 
 MyGraphicsScene* MyGraphicsRectItem::getScene() const
@@ -75,11 +81,6 @@ void MyGraphicsRectItem::hoverMoveEvent(QGraphicsSceneHoverEvent* event)
         }
     }
 }
-
-// void MyGraphicsRectItem::hoverLeaveEvent(QGraphicsSceneHoverEvent* event)
-// {
-//     QGraphicsRectItem::hoverLeaveEvent(event);
-// }
 
 void MyGraphicsRectItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 {
@@ -130,6 +131,8 @@ void MyGraphicsRectItem::paint(QPainter* painter, const QStyleOptionGraphicsItem
     painter->setPen(this->pen());
     painter->setBrush(this->brush());
     painter->drawRoundedRect(this->rect(), 20.0, 15.0);
+    painter->setFont(settings.font);
+    painter->drawText(this->rect(), settings.alignFlag, settings.text);
 }
 
 int MyGraphicsRectItem::cursorOnFrame(QPointF p) const

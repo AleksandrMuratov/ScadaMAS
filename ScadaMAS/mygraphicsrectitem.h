@@ -6,6 +6,7 @@
 #include <QObject>
 #include <QGraphicsRectItem>
 #include <QtWidgets>
+#include <QGraphicsTextItem>
 
 
 class MyGraphicsRectItem : public QObject, public QGraphicsRectItem
@@ -20,6 +21,7 @@ public:
     void setColorPressMouse(QColor color);
     MyGraphicsScene* getScene() const;
     bool isUserMode() const;
+    void setText(const QString& str);
 
 protected:
 
@@ -27,7 +29,6 @@ protected:
     void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
     void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
     void hoverMoveEvent(QGraphicsSceneHoverEvent* event) override;
-    //void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override;
     void paint(QPainter* painter, const QStyleOptionGraphicsItem * option, QWidget* widget) override;
 
 private:
@@ -71,6 +72,9 @@ private:
             pen.setWidth(2);
             return pen;
         }();
+        QString text = "Пуск";
+        QFont font = QFont("Times", 25, QFont::Normal);
+        Qt::AlignmentFlag alignFlag = Qt::AlignCenter;
     };
     Settings settings;
     DataPressMouse dataPressMouse;

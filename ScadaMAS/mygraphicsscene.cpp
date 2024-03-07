@@ -2,6 +2,7 @@
 #include "mygraphicsrectitem.h"
 
 #include <QtWidgets>
+#include <QGraphicsTextItem>
 
 MyGraphicsScene::MyGraphicsScene(QObject *parent)
     : QGraphicsScene{parent}
