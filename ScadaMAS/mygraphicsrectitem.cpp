@@ -1,56 +1,98 @@
 #include "mygraphicsrectitem.h"
+
 #include <QGraphicsSceneMouseEvent>
 #include <QCursor>
 #include <QPainter>
 
 MyGraphicsRectItem::MyGraphicsRectItem(QGraphicsItem* parent)
-    : QGraphicsRectItem(parent)
+    : QObject()
+    , QGraphicsRectItem(parent)
 {
-    this->setAcceptHoverEvents(true);
+    this->setDefaultSettings();
 }
 
 MyGraphicsRectItem::MyGraphicsRectItem(const QRectF &rect, QGraphicsItem *parent)
-    : QGraphicsRectItem(rect, parent)
+    : QObject()
+    , QGraphicsRectItem(rect, parent)
+{
+    this->setDefaultSettings();
+}
+
+void MyGraphicsRectItem::setDefaultSettings()
 {
     this->setAcceptHoverEvents(true);
+    this->setPen(settings.pen);
+    this->setBrush(settings.color);
+}
+
+void MyGraphicsRectItem::setColor(QColor color)
+{
+    settings.color = color;
+}
+
+void MyGraphicsRectItem::setColorPressMouse(QColor color)
+{
+    settings.colorPressMouse = color;
+}
+
+MyGraphicsScene* MyGraphicsRectItem::getScene() const
+{
+    return dynamic_cast<MyGraphicsScene*>(this->scene());
+}
+
+bool MyGraphicsRectItem::isUserMode() const
+{
+    auto scene = this->getScene();
+    return scene && scene->userMode();
 }
 
 void MyGraphicsRectItem::hoverMoveEvent(QGraphicsSceneHoverEvent* event)
 {
-    int edges = cursorOnFrame(mapToScene(event->pos()));
-    if(((edges & Edges::LEFT) && (edges & Edges::TOP))
-        || ((edges & Edges::RIGHT) && (edges & Edges::BOTTOM)))
+    if(!this->isUserMode())
     {
-        this->setCursor(QCursor(Qt::SizeFDiagCursor));
-    }
-    else if(((edges & Edges::RIGHT) && (edges & Edges::TOP))
-               || ((edges & Edges::LEFT) && (edges & Edges::BOTTOM)))
-    {
-        this->setCursor(QCursor(Qt::SizeBDiagCursor));
-    }
-    else if((edges & Edges::LEFT) || (edges & Edges::RIGHT))
-    {
-        this->setCursor(QCursor(Qt::SizeHorCursor));
-    }
-    else if((edges & Edges::TOP) || (edges & Edges::BOTTOM))
-    {
-        this->setCursor(QCursor(Qt::SizeVerCursor));
-    }
-    else
-    {
-        this->setCursor(QCursor(Qt::OpenHandCursor));
+        int edges = cursorOnFrame(mapToScene(event->pos()));
+        if(((edges & Edges::LEFT) && (edges & Edges::TOP))
+            || ((edges & Edges::RIGHT) && (edges & Edges::BOTTOM)))
+        {
+            this->setCursor(QCursor(Qt::SizeFDiagCursor));
+        }
+        else if(((edges & Edges::RIGHT) && (edges & Edges::TOP))
+                 || ((edges & Edges::LEFT) && (edges & Edges::BOTTOM)))
+        {
+            this->setCursor(QCursor(Qt::SizeBDiagCursor));
+        }
+        else if((edges & Edges::LEFT) || (edges & Edges::RIGHT))
+        {
+            this->setCursor(QCursor(Qt::SizeHorCursor));
+        }
+        else if((edges & Edges::TOP) || (edges & Edges::BOTTOM))
+        {
+            this->setCursor(QCursor(Qt::SizeVerCursor));
+        }
+        else
+        {
+            this->setCursor(QCursor(Qt::OpenHandCursor));
+        }
     }
 }
 
+// void MyGraphicsRectItem::hoverLeaveEvent(QGraphicsSceneHoverEvent* event)
+// {
+//     QGraphicsRectItem::hoverLeaveEvent(event);
+// }
+
 void MyGraphicsRectItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 {
-    if((dataPressMouse.mb & Qt::LeftButton) && (!dataPressMouse.edges))
+    if(!this->isUserMode())
     {
-        this->setPos(mapToScene(event->pos() - dataPressMouse.dPoint));
-    }
-    else
-    {
-        this->resizeFrame(dataPressMouse.edges, mapToScene(event->pos()));
+        if((dataPressMouse.mb & Qt::LeftButton) && (!dataPressMouse.edges))
+        {
+            this->setPos(mapToScene(event->pos() - dataPressMouse.dPoint));
+        }
+        else
+        {
+            this->resizeFrame(dataPressMouse.edges, mapToScene(event->pos()));
+        }
     }
 }
 
@@ -59,28 +101,36 @@ void MyGraphicsRectItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
     dataPressMouse.mb = event->button();
     dataPressMouse.dPoint = event->pos();
     dataPressMouse.edges = cursorOnFrame(mapToScene(dataPressMouse.dPoint));
-    if((dataPressMouse.mb & Qt::LeftButton) && (!dataPressMouse.edges))
+    if(!this->isUserMode())
     {
-        this->setCursor(QCursor(Qt::ClosedHandCursor));
+        if((dataPressMouse.mb & Qt::LeftButton) && (!dataPressMouse.edges))
+        {
+            this->setCursor(QCursor(Qt::ClosedHandCursor));
+        }
     }
+    this->setBrush(QBrush(settings.colorPressMouse));
 }
 
 void MyGraphicsRectItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
-    if(!dataPressMouse.edges)
+    if(!this->isUserMode())
     {
-        this->setCursor(QCursor(Qt::OpenHandCursor));
+        if(!dataPressMouse.edges)
+        {
+            this->setCursor(QCursor(Qt::OpenHandCursor));
+        }
+        dataPressMouse.edges = Edges::NO;
     }
-    dataPressMouse.edges = Edges::NO;
+    this->setBrush(QBrush(settings.color));
     Q_UNUSED(event);
 }
 
-// void MyGraphicsRectItem::paint(QPainter* painter, const QStyleOptionGraphicsItem * option, QWidget* widget)
-// {
-//     painter->setPen(this->pen());
-//     painter->setBrush(this->brush());
-//     painter->drawRect(this->rect());
-// }
+void MyGraphicsRectItem::paint(QPainter* painter, const QStyleOptionGraphicsItem * option, QWidget* widget)
+{
+    painter->setPen(this->pen());
+    painter->setBrush(this->brush());
+    painter->drawRoundedRect(this->rect(), 20.0, 15.0);
+}
 
 int MyGraphicsRectItem::cursorOnFrame(QPointF p) const
 {
