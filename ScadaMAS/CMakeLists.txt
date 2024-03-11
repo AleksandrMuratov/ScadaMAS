@@ -28,6 +28,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         mygraphicsscene.h mygraphicsscene.cpp
         mygraphicsview.h mygraphicsview.cpp
         mygraphicsrectitem.h mygraphicsrectitem.cpp
+        mygraphicspixmapitem.h mygraphicspixmapitem.cpp
 
     )
 # Define target properties for Android with Qt 6 as:

@@ -16,6 +16,7 @@ private:
     QMenu* createObject = nullptr;
     QAction* createRect = nullptr;
     QAction* createPushButton = nullptr;
+    QAction* createDynamicPicture = nullptr;
 };
 
 #endif // MAINMENU_H

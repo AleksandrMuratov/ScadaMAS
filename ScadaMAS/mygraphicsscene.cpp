@@ -1,5 +1,6 @@
 #include "mygraphicsscene.h"
 #include "mygraphicsrectitem.h"
+#include "mygraphicspixmapitem.h"
 
 #include <QtWidgets>
 #include <QGraphicsTextItem>
@@ -19,6 +20,12 @@ void MyGraphicsScene::slotCreateRect()
     rect->setPos(300, 300);
     QCursor cur(Qt::OpenHandCursor);
     rect->setCursor(cur);
+}
+
+void MyGraphicsScene::slotCreateDynamicPicture()
+{
+    MyGraphicsPixmapItem* pixmap = new MyGraphicsPixmapItem();
+    this->addItem(pixmap);
 }
 
 bool MyGraphicsScene::userMode() const

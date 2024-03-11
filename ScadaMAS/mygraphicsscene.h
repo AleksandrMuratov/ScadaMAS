@@ -17,6 +17,7 @@ public:
 
 public slots:
     void slotCreateRect();
+    void slotCreateDynamicPicture();
 
 private:
     bool isUserMode = false;
