@@ -23,14 +23,14 @@ protected:
 
 private:
     void setDefaultSettings();
-    int cursorOnFrame(QPointF p) const;
+    int cursorOnAngle(QPointF p) const;
     void resizeFrame(int edges, QPointF point);
     void resizeFrameLeftTop(QPointF point);
     void resizeFrameRightTop(QPointF point);
     void resizeFrameLeftDown(QPointF point);
     void resizeFrameRightDown(QPointF point);
-    void setPosAndSize(qreal x, qreal y, qreal w, qreal h);
-    QPointF getPointIntersection(QPointF point) const;
+    QPointF getPointIntersectionLeftDiagonal(QPointF point) const;
+    QPointF getPointIntersectionRightDiagonal(QPointF point) const;
     QPoint pointFromSceneToGlobal(QPointF point) const;
 
     enum Edges

@@ -44,11 +44,26 @@ QRectF MyGraphicsPixmapItem::getRect() const
     return rect;
 }
 
-QPointF MyGraphicsPixmapItem::getPointIntersection(QPointF point) const
+QPointF MyGraphicsPixmapItem::getPointIntersectionLeftDiagonal(QPointF point) const
 {
     QPointF m1 = this->scenePos();
-    QRectF rect = this->boundingRect();
+    QRectF rect = this->getRect();
     QPointF m2(m1.x() + rect.width(), m1.y() + rect.height());
+    qreal k = (m2.y() - m1.y())/(m2.x() - m1.x());
+    qreal b1 = (m1.y()*m2.x() - m1.x()*m2.y())/(m2.x()-m1.x());
+    qreal b2 = point.y() + point.x()/k;
+    QPointF res;
+    res.rx() = (b2 - b1)/(k + 1/k);
+    res.ry() = k*res.x() + b1;
+    return res;
+}
+
+QPointF MyGraphicsPixmapItem::getPointIntersectionRightDiagonal(QPointF point) const
+{
+    QPointF m1 = this->scenePos();
+    QRectF rect = this->getRect();
+    m1.rx() = m1.x() + rect.width();
+    QPointF m2(m1.x() - rect.width(), m1.y() + rect.height());
     qreal k = (m2.y() - m1.y())/(m2.x() - m1.x());
     qreal b1 = (m1.y()*m2.x() - m1.x()*m2.y())/(m2.x()-m1.x());
     qreal b2 = point.y() + point.x()/k;
@@ -82,11 +97,7 @@ void MyGraphicsPixmapItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
         }
         else
         {
-            QPointF point = mapToScene(event->pos());
-            QPointF pointIntersection = this->getPointIntersection(point);
-            QPoint pointGlobal = this->pointFromSceneToGlobal(pointIntersection);
-            this->resizeFrame(dataPressMouse.edges, pointIntersection);
-            //QCursor::setPos(pointGlobal);
+            this->resizeFrame(dataPressMouse.edges, mapToScene(event->pos()));
         }
     }
 }
@@ -95,7 +106,7 @@ void MyGraphicsPixmapItem::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
     dataPressMouse.mb = event->button();
     dataPressMouse.dPoint = event->pos();
-    dataPressMouse.edges = cursorOnFrame(mapToScene(dataPressMouse.dPoint));
+    dataPressMouse.edges = cursorOnAngle(mapToScene(dataPressMouse.dPoint));
     if(!this->isUserMode())
     {
         if((dataPressMouse.mb & Qt::LeftButton) && (!dataPressMouse.edges))
@@ -122,7 +133,7 @@ void MyGraphicsPixmapItem::hoverMoveEvent(QGraphicsSceneHoverEvent* event)
 {
     if(!this->isUserMode())
     {
-        int edges = cursorOnFrame(mapToScene(event->pos()));
+        int edges = cursorOnAngle(mapToScene(event->pos()));
         if(((edges & Edges::LEFT) && (edges & Edges::TOP))
             || ((edges & Edges::RIGHT) && (edges & Edges::BOTTOM)))
         {
@@ -140,7 +151,7 @@ void MyGraphicsPixmapItem::hoverMoveEvent(QGraphicsSceneHoverEvent* event)
     }
 }
 
-int MyGraphicsPixmapItem::cursorOnFrame(QPointF p) const
+int MyGraphicsPixmapItem::cursorOnAngle(QPointF p) const
 {
     int edges = 0;
     qreal widthFrame = 5;
@@ -168,19 +179,19 @@ void MyGraphicsPixmapItem::resizeFrame(int edges, QPointF point)
 {
     if((edges & Edges::LEFT) && (edges & Edges::TOP))
     {
-        this->resizeFrameLeftTop(point);
+        this->resizeFrameLeftTop(this->getPointIntersectionLeftDiagonal(point));
     }
     else if((edges & Edges::RIGHT) && (edges & Edges::BOTTOM))
     {
-        this->resizeFrameRightDown(point);
+        this->resizeFrameRightDown(this->getPointIntersectionLeftDiagonal(point));
     }
     else if((edges & Edges::RIGHT) && (edges & Edges::TOP))
     {
-        this->resizeFrameRightTop(point);
+        this->resizeFrameRightTop(this->getPointIntersectionRightDiagonal(point));
     }
     else if((edges & Edges::LEFT) && (edges & Edges::BOTTOM))
     {
-        this->resizeFrameLeftDown(point);
+        this->resizeFrameLeftDown(this->getPointIntersectionRightDiagonal(point));
     }
 }
 void MyGraphicsPixmapItem::resizeFrameLeftTop(QPointF point)
@@ -189,47 +200,65 @@ void MyGraphicsPixmapItem::resizeFrameLeftTop(QPointF point)
     QRectF rect = this->getRect();
     qreal w = rect.width() + delta.x();
     qreal h = rect.height() + delta.y();
-    this->setPosAndSize(point.x(), point.y(), w, h);
+    QPointF rightDownAngle;
+    QPointF curLeftTopAngle = this->scenePos();
+    rightDownAngle.rx() = curLeftTopAngle.x() + rect.width();
+    rightDownAngle.ry() = curLeftTopAngle.y() + rect.height();
+    QPointF newLeftTopAngle;
+    newLeftTopAngle.rx() = rightDownAngle.x() - w;
+    newLeftTopAngle.ry() = rightDownAngle.y() - h;
+    this->setScale(h/this->boundingRect().height());
+    this->setPos(newLeftTopAngle);
 }
 void MyGraphicsPixmapItem::resizeFrameRightTop(QPointF point)
 {
-
+    QRectF rect = this->getRect();
+    QPointF curRightTopAngle = this->scenePos();
+    curRightTopAngle.rx() = curRightTopAngle.x() + rect.width();
+    QPointF delta;
+    delta.rx() = point.x() - curRightTopAngle.x();
+    delta.ry() = curRightTopAngle.y() - point.y();
+    qreal w = rect.width() + delta.x();
+    qreal h = rect.height() + delta.y();
+    QPointF curLeftTopAngle = this->scenePos();
+    QPointF curLeftDownAngle = curLeftTopAngle;
+    curLeftDownAngle.ry() = curLeftTopAngle.y() + rect.height();
+    QPointF newLeftTopAngle;
+    newLeftTopAngle.rx() = curLeftTopAngle.x();
+    newLeftTopAngle.ry() = curLeftDownAngle.y() - h;
+    this->setScale(h/this->boundingRect().height());
+    this->setPos(newLeftTopAngle);
 }
 void MyGraphicsPixmapItem::resizeFrameLeftDown(QPointF point)
 {
-
+    QRectF rect = this->getRect();
+    QPointF curLeftDownAngle = this->scenePos();
+    curLeftDownAngle.ry() = curLeftDownAngle.y() + rect.height();
+    QPointF delta;
+    delta.rx() = curLeftDownAngle.x() - point.x();
+    delta.ry() = point.y() - curLeftDownAngle.y();
+    qreal w = rect.width() + delta.x();
+    qreal h = rect.height() + delta.y();
+    QPointF newLeftTopAngle;
+    QPointF curRightTopAngle = this->scenePos();
+    curRightTopAngle.rx() = curRightTopAngle.x() + rect.width();
+    newLeftTopAngle.rx() = curRightTopAngle.x() - w;
+    newLeftTopAngle.ry() = curRightTopAngle.y();
+    this->setScale(h/this->boundingRect().height());
+    this->setPos(newLeftTopAngle);
 }
 void MyGraphicsPixmapItem::resizeFrameRightDown(QPointF point)
 {
-
-}
-void MyGraphicsPixmapItem::setPosAndSize(qreal x, qreal y, qreal w, qreal h)
-{
-    QRectF rect = this->boundingRect();
-    qreal sc = this->scale();
-    rect.setHeight(rect.height()*sc);
-    rect.setWidth(rect.width()*sc);
-    // QTransform transform;
-    // transform.scale(h/rect.height(), w/rect.width());
-    // this->setTransform(transform);
-    qreal delta_sc = 0.0;
-    if(h/rect.height() > 1.1)
-    {
-        delta_sc = 0.1;
-    }
-    else if(h/rect.height() < 0.9)
-    {
-        delta_sc = -0.1;
-    }
-    if(h/rect.height() > 1.1 || h/rect.height() < 0.9)
-    {
-
-        this->setScale(this->scale() + delta_sc);
-        this->setPos(x, y);
-    }
-
-    // QPixmap pixmap = this->pixmap();
-    // qreal sc = h/rect.height();
-    // this->setPixmap(pixmap.scaled(rect.height() * sc, rect.width() * sc));
-    //this->setPos(x, y);
+    QRectF rect = this->getRect();
+    QPointF curRightDownAngle = this->scenePos();
+    curRightDownAngle.rx() = curRightDownAngle.x() + rect.width();
+    curRightDownAngle.ry() = curRightDownAngle.y() + rect.height();
+    QPointF delta;
+    delta.rx() = point.x() - curRightDownAngle.x();
+    delta.ry() = point.y() - curRightDownAngle.y();
+    qreal w = rect.width() + delta.x();
+    qreal h = rect.height() + delta.y();
+    QPointF newLeftTopAngle = this->scenePos();
+    this->setScale(h/this->boundingRect().height());
+    this->setPos(newLeftTopAngle);
 }
