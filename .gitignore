@@ -1,1 +1,3 @@
 build-ScadaMAS-Desktop_Qt_shared_MinGW_w64_MINGW64_MSYS2-Debug/
+build/
+*.user
