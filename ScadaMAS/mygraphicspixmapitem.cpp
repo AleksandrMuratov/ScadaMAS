@@ -194,6 +194,7 @@ void MyGraphicsPixmapItem::resizeFrame(int edges, QPointF point)
         this->resizeFrameLeftDown(this->getPointIntersectionRightDiagonal(point));
     }
 }
+
 void MyGraphicsPixmapItem::resizeFrameLeftTop(QPointF point)
 {
     QPointF delta = this->scenePos() - point;
@@ -207,9 +208,11 @@ void MyGraphicsPixmapItem::resizeFrameLeftTop(QPointF point)
     QPointF newLeftTopAngle;
     newLeftTopAngle.rx() = rightDownAngle.x() - w;
     newLeftTopAngle.ry() = rightDownAngle.y() - h;
-    this->setScale(h/this->boundingRect().height());
-    this->setPos(newLeftTopAngle);
+    this->setPosAndSize(w, h, newLeftTopAngle);
+    // this->setScale(h/this->boundingRect().height());
+    // this->setPos(newLeftTopAngle);
 }
+
 void MyGraphicsPixmapItem::resizeFrameRightTop(QPointF point)
 {
     QRectF rect = this->getRect();
@@ -226,9 +229,11 @@ void MyGraphicsPixmapItem::resizeFrameRightTop(QPointF point)
     QPointF newLeftTopAngle;
     newLeftTopAngle.rx() = curLeftTopAngle.x();
     newLeftTopAngle.ry() = curLeftDownAngle.y() - h;
-    this->setScale(h/this->boundingRect().height());
-    this->setPos(newLeftTopAngle);
+    this->setPosAndSize(w, h, newLeftTopAngle);
+    // this->setScale(h/this->boundingRect().height());
+    // this->setPos(newLeftTopAngle);
 }
+
 void MyGraphicsPixmapItem::resizeFrameLeftDown(QPointF point)
 {
     QRectF rect = this->getRect();
@@ -244,9 +249,11 @@ void MyGraphicsPixmapItem::resizeFrameLeftDown(QPointF point)
     curRightTopAngle.rx() = curRightTopAngle.x() + rect.width();
     newLeftTopAngle.rx() = curRightTopAngle.x() - w;
     newLeftTopAngle.ry() = curRightTopAngle.y();
-    this->setScale(h/this->boundingRect().height());
-    this->setPos(newLeftTopAngle);
+    this->setPosAndSize(w, h, newLeftTopAngle);
+    // this->setScale(h/this->boundingRect().height());
+    // this->setPos(newLeftTopAngle);
 }
+
 void MyGraphicsPixmapItem::resizeFrameRightDown(QPointF point)
 {
     QRectF rect = this->getRect();
@@ -259,6 +266,16 @@ void MyGraphicsPixmapItem::resizeFrameRightDown(QPointF point)
     qreal w = rect.width() + delta.x();
     qreal h = rect.height() + delta.y();
     QPointF newLeftTopAngle = this->scenePos();
-    this->setScale(h/this->boundingRect().height());
-    this->setPos(newLeftTopAngle);
+    this->setPosAndSize(w, h, newLeftTopAngle);
+    // this->setScale(h/this->boundingRect().height());
+    // this->setPos(newLeftTopAngle);
+}
+
+void MyGraphicsPixmapItem::setPosAndSize(qreal w, qreal h, QPointF newLeftTopAngle)
+{
+    if(w > minW && h > minH)
+    {
+        this->setScale(h/this->boundingRect().height());
+        this->setPos(newLeftTopAngle);
+    }
 }

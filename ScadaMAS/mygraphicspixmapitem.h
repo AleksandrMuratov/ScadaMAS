@@ -32,6 +32,7 @@ private:
     QPointF getPointIntersectionLeftDiagonal(QPointF point) const;
     QPointF getPointIntersectionRightDiagonal(QPointF point) const;
     QPoint pointFromSceneToGlobal(QPointF point) const;
+    void setPosAndSize(qreal w, qreal h, QPointF newLeftTopAngle);
 
     enum Edges
     {
@@ -50,8 +51,8 @@ private:
     };
 
     DataPressMouse dataPressMouse;
-    qreal minW = 1;
-    qreal minH = 1;
+    qreal minW = 10;
+    qreal minH = 10;
 };
 
 #endif // MYGRAPHICSPIXMAPITEM_H

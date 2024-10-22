@@ -78,8 +78,8 @@ private:
     };
     Settings settings;
     DataPressMouse dataPressMouse;
-    qreal minW = 1;
-    qreal minH = 1;
+    qreal minW = 10;
+    qreal minH = 10;
 
 };
 
