@@ -23,7 +23,6 @@ void MyGraphicsRectItem::setDefaultSettings()
     this->setAcceptHoverEvents(true);
     this->setPen(settings.pen);
     this->setBrush(settings.color);
-    //text  = new QGraphicsTextItem("Пуск", this);
 }
 
 void MyGraphicsRectItem::setColor(QColor color)
