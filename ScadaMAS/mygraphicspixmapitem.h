@@ -4,9 +4,11 @@
 #include "mygraphicsscene.h"
 
 #include <QGraphicsPixmapItem>
+#include <QMenu>
 
-class MyGraphicsPixmapItem : public QGraphicsPixmapItem
+class MyGraphicsPixmapItem : public QObject, public QGraphicsPixmapItem
 {
+    Q_OBJECT
 public:
     MyGraphicsPixmapItem(QGraphicsItem* parent = nullptr);
     MyGraphicsPixmapItem(const QPixmap& pixmap, QGraphicsItem* parent = nullptr);
@@ -15,11 +17,15 @@ public:
     MyGraphicsScene* getScene() const;
     QRectF getRect() const;
 
+public slots:
+    void removeSelf();
+
 protected:
     void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override;
     void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
     void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
     void hoverMoveEvent(QGraphicsSceneHoverEvent* event) override;
+    void contextMenuEvent(QGraphicsSceneContextMenuEvent* event) override;
 
 private:
     void setDefaultSettings();
@@ -33,6 +39,7 @@ private:
     QPointF getPointIntersectionRightDiagonal(QPointF point) const;
     QPoint pointFromSceneToGlobal(QPointF point) const;
     void setPosAndSize(qreal w, qreal h, QPointF newLeftTopAngle);
+    void createContextMenu();
 
     enum Edges
     {
@@ -50,6 +57,8 @@ private:
         int edges;
     };
 
+    QMenu context_menu;
+    bool context_menu_is_created = false;
     DataPressMouse dataPressMouse;
     qreal minW = 10;
     qreal minH = 10;

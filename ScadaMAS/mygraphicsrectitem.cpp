@@ -287,3 +287,23 @@ void MyGraphicsRectItem::resizeFrameDown(QPointF point)
     qreal h = rect.height() + deltaY;
     this->setPosAndSize(this->x(), this->y(), w, h);
 }
+
+void MyGraphicsRectItem::contextMenuEvent(QGraphicsSceneContextMenuEvent* event){
+    createContextMenu();
+    context_menu.exec(event->screenPos());
+}
+
+void MyGraphicsRectItem::removeSelf()
+{
+    this->scene()->removeItem(this);
+}
+
+void MyGraphicsRectItem::createContextMenu()
+{
+    if(!context_menu_is_created){
+        QAction* openSettings = context_menu.addAction("Настройки");
+        QAction* removeAction = context_menu.addAction("Удалить");
+        QObject::connect(removeAction, &QAction::triggered, this, &MyGraphicsRectItem::removeSelf);
+    }
+    context_menu_is_created = true;
+}

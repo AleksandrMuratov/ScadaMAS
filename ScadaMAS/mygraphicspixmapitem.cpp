@@ -209,8 +209,6 @@ void MyGraphicsPixmapItem::resizeFrameLeftTop(QPointF point)
     newLeftTopAngle.rx() = rightDownAngle.x() - w;
     newLeftTopAngle.ry() = rightDownAngle.y() - h;
     this->setPosAndSize(w, h, newLeftTopAngle);
-    // this->setScale(h/this->boundingRect().height());
-    // this->setPos(newLeftTopAngle);
 }
 
 void MyGraphicsPixmapItem::resizeFrameRightTop(QPointF point)
@@ -230,8 +228,6 @@ void MyGraphicsPixmapItem::resizeFrameRightTop(QPointF point)
     newLeftTopAngle.rx() = curLeftTopAngle.x();
     newLeftTopAngle.ry() = curLeftDownAngle.y() - h;
     this->setPosAndSize(w, h, newLeftTopAngle);
-    // this->setScale(h/this->boundingRect().height());
-    // this->setPos(newLeftTopAngle);
 }
 
 void MyGraphicsPixmapItem::resizeFrameLeftDown(QPointF point)
@@ -250,8 +246,6 @@ void MyGraphicsPixmapItem::resizeFrameLeftDown(QPointF point)
     newLeftTopAngle.rx() = curRightTopAngle.x() - w;
     newLeftTopAngle.ry() = curRightTopAngle.y();
     this->setPosAndSize(w, h, newLeftTopAngle);
-    // this->setScale(h/this->boundingRect().height());
-    // this->setPos(newLeftTopAngle);
 }
 
 void MyGraphicsPixmapItem::resizeFrameRightDown(QPointF point)
@@ -267,8 +261,6 @@ void MyGraphicsPixmapItem::resizeFrameRightDown(QPointF point)
     qreal h = rect.height() + delta.y();
     QPointF newLeftTopAngle = this->scenePos();
     this->setPosAndSize(w, h, newLeftTopAngle);
-    // this->setScale(h/this->boundingRect().height());
-    // this->setPos(newLeftTopAngle);
 }
 
 void MyGraphicsPixmapItem::setPosAndSize(qreal w, qreal h, QPointF newLeftTopAngle)
@@ -278,4 +270,25 @@ void MyGraphicsPixmapItem::setPosAndSize(qreal w, qreal h, QPointF newLeftTopAng
         this->setScale(h/this->boundingRect().height());
         this->setPos(newLeftTopAngle);
     }
+}
+
+void MyGraphicsPixmapItem::removeSelf()
+{
+    this->scene()->removeItem(this);
+}
+
+void MyGraphicsPixmapItem::createContextMenu()
+{
+    if(!context_menu_is_created){
+        QAction* openSettings = context_menu.addAction("Настройки");
+        QAction* removeAction = context_menu.addAction("Удалить");
+        QObject::connect(removeAction, &QAction::triggered, this, &MyGraphicsPixmapItem::removeSelf);
+    }
+    context_menu_is_created = true;
+}
+
+void MyGraphicsPixmapItem::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
+{
+    createContextMenu();
+    context_menu.exec(event->screenPos());
 }

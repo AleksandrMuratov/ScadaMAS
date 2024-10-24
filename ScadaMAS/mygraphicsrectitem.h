@@ -23,6 +23,9 @@ public:
     bool isUserMode() const;
     void setText(const QString& str);
 
+public slots:
+    void removeSelf();
+
 protected:
 
     void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override;
@@ -30,6 +33,8 @@ protected:
     void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
     void hoverMoveEvent(QGraphicsSceneHoverEvent* event) override;
     void paint(QPainter* painter, const QStyleOptionGraphicsItem * option, QWidget* widget) override;
+    void contextMenuEvent(QGraphicsSceneContextMenuEvent* event) override;
+
 
 private:
     void setDefaultSettings();
@@ -55,6 +60,7 @@ private:
     void resizeFrameRight(QPointF point);
     void resizeFrameDown(QPointF point);
     void setPosAndSize(qreal x, qreal y, qreal w, qreal h);
+    void createContextMenu();
 
     struct DataPressMouse
     {
@@ -76,6 +82,8 @@ private:
         QFont font = QFont("Times", 25, QFont::Normal);
         Qt::AlignmentFlag alignFlag = Qt::AlignCenter;
     };
+    QMenu context_menu;
+    bool context_menu_is_created = false;
     Settings settings;
     DataPressMouse dataPressMouse;
     qreal minW = 10;
