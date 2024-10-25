@@ -25,6 +25,7 @@ public:
 
 public slots:
     void removeSelf();
+    void openSettings();
 
 protected:
 
@@ -78,12 +79,13 @@ private:
             pen.setWidth(2);
             return pen;
         }();
-        QString text = "Пуск";
+        QString text;
         QFont font = QFont("Times", 25, QFont::Normal);
         Qt::AlignmentFlag alignFlag = Qt::AlignCenter;
     };
     QMenu context_menu;
     bool context_menu_is_created = false;
+    QString name_item;
     Settings settings;
     DataPressMouse dataPressMouse;
     qreal minW = 10;

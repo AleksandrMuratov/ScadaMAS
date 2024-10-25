@@ -3,6 +3,10 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QCursor>
 #include <QPainter>
+#include <QDialog>
+#include <QLineEdit>
+#include <QDialogButtonBox>
+#include <QFormLayout>
 
 MyGraphicsRectItem::MyGraphicsRectItem(QGraphicsItem* parent)
     : QObject()
@@ -298,12 +302,33 @@ void MyGraphicsRectItem::removeSelf()
     this->scene()->removeItem(this);
 }
 
+void MyGraphicsRectItem::openSettings()
+{
+    QDialog dlg;
+    dlg.setWindowTitle(name_item);
+    QLineEdit* edit_text = new QLineEdit(&dlg);
+    edit_text->setText(settings.text);
+    QDialogButtonBox* btn_box = new QDialogButtonBox(&dlg);
+    btn_box->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    QObject::connect(btn_box, &QDialogButtonBox::accepted, &dlg, &QDialog::accept);
+    QObject::connect(btn_box, &QDialogButtonBox::rejected, &dlg, &QDialog::reject);
+    QFormLayout* layout = new QFormLayout();
+    layout->addRow(QString("Текст:"), edit_text);
+    layout->addWidget(btn_box);
+    dlg.setLayout(layout);
+    if(dlg.exec() == QDialog::Accepted)
+    {
+        settings.text = edit_text->text();
+    }
+}
+
 void MyGraphicsRectItem::createContextMenu()
 {
     if(!context_menu_is_created){
         QAction* openSettings = context_menu.addAction("Настройки");
         QAction* removeAction = context_menu.addAction("Удалить");
         QObject::connect(removeAction, &QAction::triggered, this, &MyGraphicsRectItem::removeSelf);
+        QObject::connect(openSettings, &QAction::triggered, this, &MyGraphicsRectItem::openSettings);
     }
     context_menu_is_created = true;
 }
