@@ -24,6 +24,7 @@ MyGraphicsRectItem::MyGraphicsRectItem(const QRectF &rect, QGraphicsItem *parent
 
 void MyGraphicsRectItem::setDefaultSettings()
 {
+    name_item = "Кнопка";
     this->setAcceptHoverEvents(true);
     this->setPen(settings.pen);
     this->setBrush(settings.color);
@@ -305,7 +306,7 @@ void MyGraphicsRectItem::removeSelf()
 void MyGraphicsRectItem::openSettings()
 {
     QDialog dlg;
-    dlg.setWindowTitle(name_item);
+    dlg.setWindowTitle(QString("Свойства кнопки"));
     QLineEdit* edit_text = new QLineEdit(&dlg);
     edit_text->setText(settings.text);
     QDialogButtonBox* btn_box = new QDialogButtonBox(&dlg);
