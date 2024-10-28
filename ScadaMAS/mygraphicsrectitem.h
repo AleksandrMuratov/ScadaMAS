@@ -26,6 +26,7 @@ public:
 public slots:
     void removeSelf();
     void openSettings();
+    // void settingsFont();
 
 protected:
 
@@ -79,8 +80,8 @@ private:
             pen.setWidth(2);
             return pen;
         }();
+        QFont font = QFont("Times New Roman", 25, QFont::Normal);
         QString text;
-        QFont font = QFont("Times", 25, QFont::Normal);
         Qt::AlignmentFlag alignFlag = Qt::AlignCenter;
     };
     QMenu context_menu;

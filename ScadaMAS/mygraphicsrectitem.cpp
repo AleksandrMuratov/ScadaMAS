@@ -1,4 +1,5 @@
 #include "mygraphicsrectitem.h"
+#include "dialogsettingsmenurectitem.h"
 
 #include <QGraphicsSceneMouseEvent>
 #include <QCursor>
@@ -305,21 +306,28 @@ void MyGraphicsRectItem::removeSelf()
 
 void MyGraphicsRectItem::openSettings()
 {
-    QDialog dlg;
+    dialogSettingsRectItem dlg(settings.font);
+    QFont current_font = settings.font;
     dlg.setWindowTitle(QString("Свойства кнопки"));
+    QHBoxLayout* settings_text = new QHBoxLayout();
     QLineEdit* edit_text = new QLineEdit(&dlg);
     edit_text->setText(settings.text);
+    QPushButton* settings_font = new QPushButton("Шрифт", &dlg);
+    QObject::connect(settings_font, &QPushButton::clicked, &dlg, dialogSettingsRectItem::settingsFont);
+    settings_text->addWidget(edit_text);
+    settings_text->addWidget(settings_font);
     QDialogButtonBox* btn_box = new QDialogButtonBox(&dlg);
     btn_box->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     QObject::connect(btn_box, &QDialogButtonBox::accepted, &dlg, &QDialog::accept);
     QObject::connect(btn_box, &QDialogButtonBox::rejected, &dlg, &QDialog::reject);
     QFormLayout* layout = new QFormLayout();
-    layout->addRow(QString("Текст:"), edit_text);
+    layout->addRow(settings_text);
     layout->addWidget(btn_box);
     dlg.setLayout(layout);
     if(dlg.exec() == QDialog::Accepted)
     {
         settings.text = edit_text->text();
+        settings.font = dlg.getNewFont();
     }
 }
 
@@ -333,3 +341,13 @@ void MyGraphicsRectItem::createContextMenu()
     }
     context_menu_is_created = true;
 }
+
+// void MyGraphicsRectItem::settingsFont()
+// {
+//     bool ok;
+//     QFont font = QFontDialog::getFont(&ok, settings.font, this, QString::fromUtf8("Выберите шрифт"));
+//     if(ok)
+//     {
+//         settings.font = font;
+//     }
+// }
