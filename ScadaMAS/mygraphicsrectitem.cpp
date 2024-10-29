@@ -306,28 +306,60 @@ void MyGraphicsRectItem::removeSelf()
 
 void MyGraphicsRectItem::openSettings()
 {
-    dialogSettingsRectItem dlg(settings.font);
-    QFont current_font = settings.font;
+    dialog_rect::Settings settings_dialog;
+    settings_dialog.font = settings.font;
+    settings_dialog.backGroundColor = settings.color;
+    settings_dialog.pressBackGroundColor = settings.colorPressMouse;
+    dialog_rect::dialogSettingsRectItem dlg(settings_dialog);
     dlg.setWindowTitle(QString("Свойства кнопки"));
+    QVBoxLayout* all_settings = new QVBoxLayout();
+
+    //Настройка текста и шрифта
     QHBoxLayout* settings_text = new QHBoxLayout();
+    QLabel* label_text = new QLabel("Текст", &dlg);
     QLineEdit* edit_text = new QLineEdit(&dlg);
     edit_text->setText(settings.text);
     QPushButton* settings_font = new QPushButton("Шрифт", &dlg);
-    QObject::connect(settings_font, &QPushButton::clicked, &dlg, dialogSettingsRectItem::settingsFont);
+    QObject::connect(settings_font, &QPushButton::clicked, &dlg, dialog_rect::dialogSettingsRectItem::settingsFont);
+    settings_text->addWidget(label_text);
     settings_text->addWidget(edit_text);
     settings_text->addWidget(settings_font);
+
+    //Настройка фона и фона при нажатии клавиши
+    QHBoxLayout* settings_color = new QHBoxLayout();
+    QLabel* label_color = new QLabel("Цвет фона", &dlg);
+    QPushButton* settings_color_button = new QPushButton(&dlg);
+    QString color_background = "background-color: ";
+    color_background += settings.color.name();
+    color_background += ";";
+    settings_color_button->setStyleSheet(color_background);
+    settings_color->addWidget(label_color);
+    settings_color->addWidget(settings_color_button);
+    QObject::connect(settings_color_button, &QPushButton::clicked, &dlg, dialog_rect::dialogSettingsRectItem::settingsColor);
+    QObject::connect(&dlg, &dialog_rect::dialogSettingsRectItem::setNewBackGroundColor, settings_color_button, &QPushButton::setStyleSheet);
+
+    all_settings->addLayout(settings_text);
+    all_settings->addLayout(settings_color);
+
     QDialogButtonBox* btn_box = new QDialogButtonBox(&dlg);
     btn_box->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     QObject::connect(btn_box, &QDialogButtonBox::accepted, &dlg, &QDialog::accept);
     QObject::connect(btn_box, &QDialogButtonBox::rejected, &dlg, &QDialog::reject);
     QFormLayout* layout = new QFormLayout();
-    layout->addRow(settings_text);
+    layout->addRow(all_settings);
     layout->addWidget(btn_box);
     dlg.setLayout(layout);
     if(dlg.exec() == QDialog::Accepted)
     {
         settings.text = edit_text->text();
         settings.font = dlg.getNewFont();
+        settings.color = dlg.getNewBackGroundColor();
+        settings.colorPressMouse = dlg.getNewPressBackGroundColor();
+        //this->update();
+        // auto views = this->scene()->views();
+        // if(!views.empty()){
+        //     views[0]->invalidateScene();
+        // }
     }
 }
 
