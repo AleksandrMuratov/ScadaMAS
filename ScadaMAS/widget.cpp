@@ -22,7 +22,7 @@ Widget::Widget(QWidget *parent)
         this->setGeometry(0, 0, sizeWindow.width(), sizeWindow.height());
     }
     MyGraphicsScene* pScene = new MyGraphicsScene(QRectF(0, 0, sizeWindow.width(), sizeWindow.height()));
-    pView = new MyGraphicsView(pScene);
+    pView = new MyGraphicsView(pScene, this);
     MainMenu* pMenu = new MainMenu(pScene);
     QVBoxLayout* pvbxLayout = new QVBoxLayout;
     pvbxLayout->addWidget(pMenu);

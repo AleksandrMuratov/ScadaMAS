@@ -355,11 +355,11 @@ void MyGraphicsRectItem::openSettings()
         settings.font = dlg.getNewFont();
         settings.color = dlg.getNewBackGroundColor();
         settings.colorPressMouse = dlg.getNewPressBackGroundColor();
-        //this->update();
+        //this->itemChange(QGraphicsItem::ItemPositionHasChanged, this->pos());
+        // QRectF rect_current = this->sceneBoundingRect();
+        // this->scene()->update(rect_current);
         // auto views = this->scene()->views();
-        // if(!views.empty()){
-        //     views[0]->invalidateScene();
-        // }
+        // views[0]->update();
     }
 }
 
