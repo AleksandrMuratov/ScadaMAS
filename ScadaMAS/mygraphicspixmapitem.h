@@ -39,6 +39,7 @@ private:
     QPointF getPointIntersectionRightDiagonal(QPointF point) const;
     QPoint pointFromSceneToGlobal(QPointF point) const;
     void setPosAndSize(qreal w, qreal h, QPointF newLeftTopAngle);
+    void setPosForScene(QPointF pos);
     void createContextMenu();
 
     enum Edges

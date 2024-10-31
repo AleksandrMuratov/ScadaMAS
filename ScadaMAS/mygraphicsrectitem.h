@@ -61,6 +61,7 @@ private:
     void resizeFrameLeft(QPointF point);
     void resizeFrameRight(QPointF point);
     void resizeFrameDown(QPointF point);
+    void setPosForScene(QPointF pos);
     void setPosAndSize(qreal x, qreal y, qreal w, qreal h);
     void createContextMenu();
 
@@ -83,6 +84,8 @@ private:
         QFont font = QFont("Times New Roman", 25, QFont::Normal);
         QString text;
         Qt::AlignmentFlag alignFlag = Qt::AlignCenter;
+        qreal xRadius = 20.0;
+        qreal yRadius = 15.0;
     };
     QMenu context_menu;
     bool context_menu_is_created = false;

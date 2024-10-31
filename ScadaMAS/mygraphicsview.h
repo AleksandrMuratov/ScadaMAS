@@ -10,6 +10,9 @@ public:
     MyGraphicsView(QWidget* parrent = nullptr);
     MyGraphicsView(QGraphicsScene* scene, QWidget* parrent = nullptr);
 
+protected:
+    void wheelEvent(QWheelEvent* event) override;
+
 protected slots:
     void resizeEvent(QResizeEvent* event);
 };

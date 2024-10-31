@@ -53,6 +53,10 @@ void dialogSettingsRectItem::settingsPressColor()
     QColor color = QColorDialog::getColor(new_backGroundColor_, this);
     if(color.isValid()){
         new_press_backGroundColor_ = color;
+        QString color_background = "background-color: ";
+        color_background += new_press_backGroundColor_.name();
+        color_background += ";";
+        emit setNewPressBackGroundColor(color_background);
     }
 }
 
