@@ -1,5 +1,5 @@
 #include "mygraphicsrectitem.h"
-#include "dialogsettingsmenurectitem.h"
+#include "dialogsettingsrectitem.h"
 
 #include <QGraphicsSceneMouseEvent>
 #include <QCursor>
@@ -93,7 +93,6 @@ void MyGraphicsRectItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
     {
         if((dataPressMouse.mb & Qt::LeftButton) && (!dataPressMouse.edges))
         {
-            //this->setPosForScene(mapToScene(event->pos() - dataPressMouse.dPoint));
             this->setPos(mapToScene(event->pos() - dataPressMouse.dPoint));
         }
         else
@@ -134,7 +133,7 @@ void MyGraphicsRectItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
 void MyGraphicsRectItem::paint(QPainter* painter, const QStyleOptionGraphicsItem * option, QWidget* widget)
 {
-    painter->setPen(this->pen());
+    painter->setPen(settings.pen);
     painter->setBrush(this->brush());
     painter->drawRoundedRect(this->rect(), settings.xRadius, settings.yRadius);
     painter->setFont(settings.font);
@@ -318,85 +317,30 @@ void MyGraphicsRectItem::removeSelf()
 void MyGraphicsRectItem::openSettings()
 {
     dialog_rect::Settings settings_dialog;
+    settings_dialog.text = settings.text;
     settings_dialog.font = settings.font;
     settings_dialog.backGroundColor = settings.color;
     settings_dialog.pressBackGroundColor = settings.colorPressMouse;
+    settings_dialog.xRadius = settings.xRadius;
+    settings_dialog.yRadius = settings.yRadius;
+    settings_dialog.widthPen = settings.pen.widthF();
+    settings_dialog.penColor = settings.pen.color();
     dialog_rect::dialogSettingsRectItem dlg(settings_dialog);
     dlg.setWindowTitle(QString("Свойства кнопки"));
-    QVBoxLayout* all_settings = new QVBoxLayout();
-
-    //Настройка текста и шрифта
-    QHBoxLayout* settings_text = new QHBoxLayout();
-    QLabel* label_text = new QLabel("Текст", &dlg);
-    QLineEdit* edit_text = new QLineEdit(&dlg);
-    edit_text->setText(settings.text);
-    QPushButton* settings_font = new QPushButton("Шрифт", &dlg);
-    QObject::connect(settings_font, &QPushButton::clicked, &dlg, dialog_rect::dialogSettingsRectItem::settingsFont);
-    settings_text->addWidget(label_text);
-    settings_text->addWidget(edit_text);
-    settings_text->addWidget(settings_font);
-
-    QString color_background = "background-color: ";
-
-    //Настройка фона
-    QHBoxLayout* settings_color = new QHBoxLayout();
-    QLabel* label_color = new QLabel("Цвет фона", &dlg);
-    QPushButton* settings_color_button = new QPushButton(&dlg);
-    settings_color_button->setStyleSheet(color_background + settings.color.name() + ";");
-    settings_color->addWidget(label_color);
-    settings_color->addWidget(settings_color_button);
-    QObject::connect(settings_color_button, &QPushButton::clicked, &dlg, dialog_rect::dialogSettingsRectItem::settingsColor);
-    QObject::connect(&dlg, &dialog_rect::dialogSettingsRectItem::setNewBackGroundColor, settings_color_button, &QPushButton::setStyleSheet);
-
-    //Настройка фона при нажатии ЛКМ
-    QHBoxLayout* settings_press_color = new QHBoxLayout();
-    QLabel* label_press_color = new QLabel("Цвет фона при нажатии", &dlg);
-    QPushButton* settings_press_color_button = new QPushButton(&dlg);
-    settings_press_color_button->setStyleSheet(color_background + settings.colorPressMouse.name() + ";");
-    settings_press_color->addWidget(label_press_color);
-    settings_press_color->addWidget(settings_press_color_button);
-    QObject::connect(settings_press_color_button, &QPushButton::clicked, &dlg, dialog_rect::dialogSettingsRectItem::settingsPressColor);
-    QObject::connect(&dlg, &dialog_rect::dialogSettingsRectItem::setNewPressBackGroundColor, settings_press_color_button, &QPushButton::setStyleSheet);
-
-    //Настройка радиуса углов прямоугольника по оси X
-    QHBoxLayout* settingsRadius = new QHBoxLayout();
-    QLabel* label_x_radius = new QLabel("Радиус угла по X", &dlg);
-    QLineEdit* editXRadius = new QLineEdit(&dlg);
-    editXRadius->setValidator(new QDoubleValidator(0.0, std::numeric_limits<double>::max(), 1, &dlg));
-    editXRadius->setText(QString::number(settings.xRadius, 'f', 1));
-    settingsRadius->addWidget(label_x_radius);
-    settingsRadius->addWidget(editXRadius);
-
-    //Настройка радиуса углов прямоугольника по оси Y
-    QLabel* label_y_radius = new QLabel("по Y", &dlg);
-    QLineEdit* editYRadius = new QLineEdit(&dlg);
-    editYRadius->setValidator(new QDoubleValidator(0.0, std::numeric_limits<double>::max(), 1, &dlg));
-    editYRadius->setText(QString::number(settings.yRadius, 'f', 1));
-    settingsRadius->addWidget(label_y_radius);
-    settingsRadius->addWidget(editYRadius);
-
-    all_settings->addLayout(settings_text);
-    all_settings->addLayout(settings_color);
-    all_settings->addLayout(settings_press_color);
-    all_settings->addLayout(settingsRadius);
-
-    QDialogButtonBox* btn_box = new QDialogButtonBox(&dlg);
-    btn_box->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-    QObject::connect(btn_box, &QDialogButtonBox::accepted, &dlg, &QDialog::accept);
-    QObject::connect(btn_box, &QDialogButtonBox::rejected, &dlg, &QDialog::reject);
-    QFormLayout* layout = new QFormLayout();
-    layout->addRow(all_settings);
-    layout->addWidget(btn_box);
-    dlg.setLayout(layout);
     if(dlg.exec() == QDialog::Accepted)
     {
-        settings.text = edit_text->text();
+        settings.text = dlg.findChild<QLineEdit*>("text")->text();
         settings.font = dlg.getNewFont();
         settings.color = dlg.getNewBackGroundColor();
         settings.colorPressMouse = dlg.getNewPressBackGroundColor();
-        settings.xRadius = editXRadius->text().replace(',', '.').toDouble();
-        settings.yRadius = editYRadius->text().replace(',', '.').toDouble();
+        settings.xRadius = dlg.findChild<QLineEdit*>("editXRadius")->text().replace(',', '.').toDouble();
+        settings.yRadius = dlg.findChild<QLineEdit*>("editYRadius")->text().replace(',', '.').toDouble();
         this->setBrush(QBrush(settings.color));
+        QColor colorPen = dlg.getNewPenColor();
+        settings.pen = QPen(colorPen);
+        //QLineEdit* editWidthFrame = dlg.findChild<QLineEdit*>("editWidthFrame");
+        qreal width_pen = dlg.findChild<QLineEdit*>("editWidthFrame")->text().replace(',', '.').toDouble();
+        settings.pen.setWidthF(width_pen);
     }
 }
 

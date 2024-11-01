@@ -16,6 +16,8 @@ public:
     bool isUserMode() const;
     MyGraphicsScene* getScene() const;
     QRectF getRect() const;
+    QRectF getRectForPen() const;
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
 public slots:
     void removeSelf();
@@ -39,7 +41,6 @@ private:
     QPointF getPointIntersectionRightDiagonal(QPointF point) const;
     QPoint pointFromSceneToGlobal(QPointF point) const;
     void setPosAndSize(qreal w, qreal h, QPointF newLeftTopAngle);
-    void setPosForScene(QPointF pos);
     void createContextMenu();
 
     enum Edges
@@ -58,7 +59,19 @@ private:
         int edges;
     };
 
+    struct Settings
+    {
+        QPen pen = []()
+        {
+            QPen pen = QPen(Qt::black);
+            pen.setWidth(5);
+            return pen;
+        }();
+
+    };
+
     QMenu context_menu;
+    Settings settings;
     bool context_menu_is_created = false;
     DataPressMouse dataPressMouse;
     qreal minW = 10;

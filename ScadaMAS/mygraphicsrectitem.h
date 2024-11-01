@@ -26,7 +26,6 @@ public:
 public slots:
     void removeSelf();
     void openSettings();
-    // void settingsFont();
 
 protected:
 
@@ -78,7 +77,7 @@ private:
         QPen pen = []()
         {
             QPen pen = QPen(Qt::black);
-            pen.setWidth(2);
+            pen.setWidth(5);
             return pen;
         }();
         QFont font = QFont("Times New Roman", 25, QFont::Normal);

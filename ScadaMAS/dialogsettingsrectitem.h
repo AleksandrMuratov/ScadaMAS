@@ -1,14 +1,20 @@
-#ifndef DIALOGSETTINGSMENURECTITEM_H
-#define DIALOGSETTINGSMENURECTITEM_H
+#ifndef DIALOGSETTINGSRECTITEM_H
+#define DIALOGSETTINGSRECTITEM_H
 
 #include <QDialog>
+#include <QPen>
 
 namespace dialog_rect{
 
 struct Settings{
+    QString text;
     QFont font;
     QColor backGroundColor;
     QColor pressBackGroundColor;
+    QColor penColor;
+    qreal widthPen;
+    qreal xRadius;
+    qreal yRadius;
 };
 
 class dialogSettingsRectItem : public QDialog
@@ -20,24 +26,25 @@ public:
     QFont getNewFont() const;
     QColor getNewBackGroundColor() const;
     QColor getNewPressBackGroundColor() const;
+    QColor getNewPenColor() const;
 
 public slots:
     void settingsFont();
     void settingsColor();
     void settingsPressColor();
+    void settingsPenColor();
 
 signals:
     void setNewBackGroundColor(QString color);
     void setNewPressBackGroundColor(QString color);
+    void setNewPenColor(QString color);
 
 private:
-    QFont new_font_;
-    QColor new_backGroundColor_;
-    QColor new_press_backGroundColor_;
+    Settings settings_;
 };
 
 } //namespace dialog_rect
 
 
 
-#endif // DIALOGSETTINGSMENURECTITEM_H
+#endif // DIALOGSETTINGSRECTITEM_H

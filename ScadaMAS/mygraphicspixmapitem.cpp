@@ -44,6 +44,27 @@ QRectF MyGraphicsPixmapItem::getRect() const
     return rect;
 }
 
+QRectF MyGraphicsPixmapItem::getRectForPen() const
+{
+    qreal width_pen = settings.pen.widthF();
+    QRectF rect = this->boundingRect();
+    rect.setX(rect.x() + width_pen/2);
+    rect.setY(rect.y() + width_pen/2);
+    rect.setWidth(rect.width() - width_pen/2);
+    rect.setHeight(rect.height() - width_pen/2);
+    return rect;
+}
+
+void MyGraphicsPixmapItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+{
+    QGraphicsPixmapItem::paint(painter, option, widget);
+    painter->setPen(settings.pen);
+    QColor gr = Qt::green;
+    gr.setAlphaF(0.0);
+    painter->setBrush(QBrush(gr));
+    painter->drawRect(this->getRectForPen());
+}
+
 QPointF MyGraphicsPixmapItem::getPointIntersectionLeftDiagonal(QPointF point) const
 {
     QPointF m1 = this->scenePos();
