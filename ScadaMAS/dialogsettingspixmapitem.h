@@ -8,8 +8,8 @@ namespace dialog_pixmap{
 
 struct Settings{
     bool frame = false;
-    qreal width_pen = 0.0;
-    QColor color_pen = Qt::black;
+    qreal widthPen = 1.0;
+    QColor penColor = Qt::black;
 };
 
 class dialogSettingsPixmapItem : public QDialog
@@ -22,8 +22,7 @@ public:
     bool FrameOn() const;
 
 private:
-    bool frame_;
-    QPen pen_;
+    Settings settings_;
 };
 
 } // namespace dialog_pixmap
