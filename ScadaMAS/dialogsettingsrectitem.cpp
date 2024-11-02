@@ -1,4 +1,5 @@
 #include "dialogsettingsrectitem.h"
+#include "doublerangevalidator.h"
 #include <QFontDialog>
 #include <QColorDialog>
 #include <QVBoxLayout>
@@ -7,7 +8,6 @@
 #include <QLineEdit>
 #include <QDialogButtonBox>
 #include <QFormLayout>
-#include <QDoubleValidator>
 
 namespace dialog_rect {
 
@@ -56,8 +56,8 @@ dialogSettingsRectItem::dialogSettingsRectItem(Settings settings, QWidget* paren
     QLabel* label_x_radius = new QLabel("Радиус угла по X", this);
     QLineEdit* editXRadius = new QLineEdit(this);
     editXRadius->setObjectName("editXRadius");
-    editXRadius->setValidator(new QDoubleValidator(0.0, std::numeric_limits<double>::max(), 1, this));
-    editXRadius->setText(QString::number(settings_.xRadius, 'f', 1));
+    editXRadius->setValidator(new DoubleRangeValidator(0.0, std::numeric_limits<double>::max(), 1, this));
+    editXRadius->setText(QString::number(settings_.xRadius, 'f', 1).replace('.', ','));
     settingsRadius->addWidget(label_x_radius);
     settingsRadius->addWidget(editXRadius);
 
@@ -65,8 +65,9 @@ dialogSettingsRectItem::dialogSettingsRectItem(Settings settings, QWidget* paren
     QLabel* label_y_radius = new QLabel("по Y", this);
     QLineEdit* editYRadius = new QLineEdit(this);
     editYRadius->setObjectName("editYRadius");
-    editYRadius->setValidator(new QDoubleValidator(0.0, std::numeric_limits<double>::max(), 1, this));
-    editYRadius->setText(QString::number(settings_.yRadius, 'f', 1));
+    //editYRadius->setValidator(new QDoubleValidator(this));
+    editYRadius->setValidator(new DoubleRangeValidator(0.0, std::numeric_limits<double>::max(), 1, this));
+    editYRadius->setText(QString::number(settings_.yRadius, 'f', 1).replace('.', ','));
     settingsRadius->addWidget(label_y_radius);
     settingsRadius->addWidget(editYRadius);
 
@@ -85,10 +86,8 @@ dialogSettingsRectItem::dialogSettingsRectItem(Settings settings, QWidget* paren
     QLabel* label_width_frame = new QLabel("Толщина рамки", this);
     QLineEdit* editWidthFrame = new QLineEdit(this);
     editWidthFrame->setObjectName("editWidthFrame");
-    QDoubleValidator* wValidator = new QDoubleValidator(0.0, 10.0, 1, editWidthFrame);
-    wValidator->setRange(0.0, 10.0, 1);
-    editWidthFrame->setValidator(wValidator);
-    editWidthFrame->setText(QString::number(settings_.widthPen, 'f', 1));
+    editWidthFrame->setValidator(new DoubleRangeValidator(0.0, 10.0, 1, this));
+    editWidthFrame->setText(QString::number(settings_.widthPen, 'f', 1).replace('.', ','));
     settings_width_frame->addWidget(label_width_frame);
     settings_width_frame->addWidget(editWidthFrame);
 
