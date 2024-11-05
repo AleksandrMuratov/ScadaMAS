@@ -1,4 +1,5 @@
 #include "mygraphicspixmapitem.h"
+#include "dialogsettingspixmapitem.h"
 
 #include <QGraphicsSceneMouseEvent>
 #include <QCursor>
@@ -58,11 +59,13 @@ QRectF MyGraphicsPixmapItem::getRectForPen() const
 void MyGraphicsPixmapItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     QGraphicsPixmapItem::paint(painter, option, widget);
-    painter->setPen(settings.pen);
-    QColor gr = Qt::green;
-    gr.setAlphaF(0.0);
-    painter->setBrush(QBrush(gr));
-    painter->drawRect(this->getRectForPen());
+    if(settings.frame){
+        painter->setPen(settings.pen);
+        QColor gr = Qt::green;
+        gr.setAlphaF(0.0);
+        painter->setBrush(QBrush(gr));
+        painter->drawRect(this->getRectForPen());
+    }
 }
 
 QPointF MyGraphicsPixmapItem::getPointIntersectionLeftDiagonal(QPointF point) const
@@ -298,12 +301,30 @@ void MyGraphicsPixmapItem::removeSelf()
     this->scene()->removeItem(this);
 }
 
+void MyGraphicsPixmapItem::openSettings()
+{
+    dialog_pixmap::Settings settings_dialog;
+    settings_dialog.frame = settings.frame;
+    settings_dialog.penColor = settings.pen.color();
+    settings_dialog.widthPen = settings.pen.widthF();
+    dialog_pixmap::dialogSettingsPixmapItem dlg(settings_dialog);
+    dlg.setWindowTitle("Свойства картинки");
+    if(dlg.exec() == QDialog::Accepted)
+    {
+        settings.frame = dlg.FrameOn();
+        QPen pen(dlg.GetNewColorFrame());
+        pen.setWidthF(dlg.GetNewWidthFrame());
+        settings.pen = pen;
+    }
+}
+
 void MyGraphicsPixmapItem::createContextMenu()
 {
     if(!context_menu_is_created){
         QAction* openSettings = context_menu.addAction("Настройки");
         QAction* removeAction = context_menu.addAction("Удалить");
         QObject::connect(removeAction, &QAction::triggered, this, &MyGraphicsPixmapItem::removeSelf);
+        QObject::connect(openSettings, &QAction::triggered, this, &MyGraphicsPixmapItem::openSettings);
     }
     context_menu_is_created = true;
 }

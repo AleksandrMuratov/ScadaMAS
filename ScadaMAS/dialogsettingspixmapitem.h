@@ -8,7 +8,7 @@ namespace dialog_pixmap{
 
 struct Settings{
     bool frame = false;
-    qreal widthPen = 1.0;
+    qreal widthPen = 5.0;
     QColor penColor = Qt::black;
 };
 
@@ -18,8 +18,15 @@ class dialogSettingsPixmapItem : public QDialog
 public:
     dialogSettingsPixmapItem(Settings settings, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
 
-    QPen GetPen() const;
+    QColor GetNewColorFrame() const;
+    qreal GetNewWidthFrame() const;
     bool FrameOn() const;
+
+public slots:
+    void dialogSettingsColorFrame();
+
+signals:
+    void setNewColorFrame(QString color);
 
 private:
     Settings settings_;

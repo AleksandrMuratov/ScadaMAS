@@ -21,6 +21,7 @@ public:
 
 public slots:
     void removeSelf();
+    void openSettings();
 
 protected:
     void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override;
@@ -61,6 +62,7 @@ private:
 
     struct Settings
     {
+        bool frame = true;
         QPen pen = []()
         {
             QPen pen = QPen(Qt::black);

@@ -338,7 +338,6 @@ void MyGraphicsRectItem::openSettings()
         this->setBrush(QBrush(settings.color));
         QColor colorPen = dlg.getNewPenColor();
         settings.pen = QPen(colorPen);
-        //QLineEdit* editWidthFrame = dlg.findChild<QLineEdit*>("editWidthFrame");
         qreal width_pen = dlg.findChild<QLineEdit*>("editWidthFrame")->text().replace(',', '.').toDouble();
         settings.pen.setWidthF(width_pen);
     }
