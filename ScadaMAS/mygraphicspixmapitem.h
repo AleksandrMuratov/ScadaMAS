@@ -69,7 +69,7 @@ private:
             pen.setWidth(5);
             return pen;
         }();
-
+        QString fileName;
     };
 
     QMenu context_menu;

@@ -8,6 +8,8 @@
 #include <QLineEdit>
 #include <QDialogButtonBox>
 #include <QFormLayout>
+#include <QCheckBox>
+#include <QFileDialog>
 
 namespace dialog_pixmap {
 
@@ -17,9 +19,13 @@ dialogSettingsPixmapItem::dialogSettingsPixmapItem(Settings settings, QWidget* p
 {
     QVBoxLayout* all_settings = new QVBoxLayout();
 
-    QHBoxLayout* Frame = new QHBoxLayout();
-    QLabel* frameOn = new QLabel("Рамка", this);
-
+    QHBoxLayout* frame = new QHBoxLayout();
+    QLabel* frameLabel = new QLabel("Рамка", this);
+    QCheckBox* frameCheckBox = new QCheckBox(this);
+    frameCheckBox->setObjectName("Frame");
+    frameCheckBox->setChecked(settings_.frame);
+    frame->addWidget(frameLabel);
+    frame->addWidget(frameCheckBox);
 
     QString color_background = "background-color: ";
 
@@ -44,8 +50,18 @@ dialogSettingsPixmapItem::dialogSettingsPixmapItem(Settings settings, QWidget* p
     settings_width_frame->addWidget(label_width_frame);
     settings_width_frame->addWidget(editWidthFrame);
 
+    // Выбор файла картинки
+    QHBoxLayout* settings_image_file = new QHBoxLayout();
+    QLabel* label_image_file = new QLabel("Выбрать картинку", this);
+    QPushButton* settings_image_file_button = new QPushButton(this);
+    settings_image_file->addWidget(label_image_file);
+    settings_image_file->addWidget(settings_image_file_button);
+    QObject::connect(settings_image_file_button, &QPushButton::clicked, this, &dialogSettingsPixmapItem::dialogSelectFileImage);
+
+    all_settings->addLayout(frame);
     all_settings->addLayout(settings_color_frame);
     all_settings->addLayout(settings_width_frame);
+    all_settings->addLayout(settings_image_file);
 
     QDialogButtonBox* btn_box = new QDialogButtonBox(this);
     btn_box->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
@@ -68,9 +84,15 @@ qreal dialogSettingsPixmapItem::GetNewWidthFrame() const
     return editWidthFrame->text().replace(',', '.').toDouble();
 }
 
+const QString& dialogSettingsPixmapItem::GetNewPathToImage() const
+{
+    return settings_.fileName;
+}
+
 bool dialogSettingsPixmapItem::FrameOn() const
 {
-    return settings_.frame;
+    QCheckBox* frame = this->findChild<QCheckBox*>("Frame");
+    return frame->isChecked();
 }
 
 void dialogSettingsPixmapItem::dialogSettingsColorFrame()
@@ -83,6 +105,12 @@ void dialogSettingsPixmapItem::dialogSettingsColorFrame()
         color_background += ";";
         emit setNewColorFrame(color_background);
     }
+}
+
+void dialogSettingsPixmapItem::dialogSelectFileImage()
+{
+    QString fileName = QFileDialog::getOpenFileName(this, QString::fromUtf8("Открыть файл"), QDir::currentPath(), "Images (*.png *.xpm *.jpg);;All files (*.*)");
+    settings_.fileName = fileName;
 }
 
 }

@@ -21,8 +21,9 @@ MyGraphicsPixmapItem::MyGraphicsPixmapItem(const QPixmap& pixmap, QGraphicsItem*
 
 void MyGraphicsPixmapItem::setDefaultSettings()
 {
+    settings.fileName = "C:/picters/1.jpg";
     this->setAcceptHoverEvents(true);
-    this->setPixmap(QPixmap("C:/picters/1.jpg"));
+    this->setPixmap(QPixmap(settings.fileName));
 }
 
 bool MyGraphicsPixmapItem::isUserMode() const
@@ -315,6 +316,8 @@ void MyGraphicsPixmapItem::openSettings()
         QPen pen(dlg.GetNewColorFrame());
         pen.setWidthF(dlg.GetNewWidthFrame());
         settings.pen = pen;
+        settings.fileName = dlg.GetNewPathToImage();
+        this->setPixmap(QPixmap(settings.fileName));
     }
 }
 
