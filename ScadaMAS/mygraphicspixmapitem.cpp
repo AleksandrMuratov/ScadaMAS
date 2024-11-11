@@ -308,6 +308,7 @@ void MyGraphicsPixmapItem::openSettings()
     settings_dialog.frame = settings.frame;
     settings_dialog.penColor = settings.pen.color();
     settings_dialog.widthPen = settings.pen.widthF();
+    settings_dialog.fileName = settings.fileName;
     dialog_pixmap::dialogSettingsPixmapItem dlg(settings_dialog);
     dlg.setWindowTitle("Свойства картинки");
     if(dlg.exec() == QDialog::Accepted)
