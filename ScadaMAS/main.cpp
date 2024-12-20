@@ -1,20 +1,23 @@
-#include "widget.h"
+#include "mainwindow.h"
 
 #include <QApplication>
-#include <QTranslator>
 #include <QLocale>
-#include <QLibraryInfo>
+#include <QTranslator>
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    QString translatorFileName = QLatin1String("qt_");
-    translatorFileName += QLocale::system().name();
-    QTranslator *translator = new QTranslator(&a);
-    if (translator->load(translatorFileName, QLibraryInfo::location(QLibraryInfo::TranslationsPath))){
-        a.installTranslator(translator);
+
+    QTranslator translator;
+    const QStringList uiLanguages = QLocale::system().uiLanguages();
+    for (const QString &locale : uiLanguages) {
+        const QString baseName = "ScadaMAS_" + QLocale(locale).name();
+        if (translator.load(":/i18n/" + baseName)) {
+            a.installTranslator(&translator);
+            break;
+        }
     }
-    Widget wgt;
-    wgt.show();
+    MainWindow w;
+    w.show();
     return a.exec();
 }
